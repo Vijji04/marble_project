@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { DatePicker, Dropdown, Space, Menu } from "antd";
+import { DatePicker, Dropdown, Space, Menu, RangePickerValue } from "antd";
 import {
   DownOutlined,
   EditOutlined,
@@ -19,6 +19,7 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 dayjs.extend(isBetween);
+
 interface DataPoint {
   month: string;
   onlineStoreSession: number;
@@ -174,12 +175,12 @@ const generateData = (): DataPoint[] => {
 };
 
 export const Linechart: React.FC = () => {
-  const [selectedDataKey, setSelectedDataKey] = useState<keyof DataPoint>(
-    "Online_Store_Session1"
-  );
-  const [newSelectedDataKey, setNewSelectedDataKey] = useState<keyof DataPoint>(
-    "Online_Store_Session2"
-  );
+  const [selectedDataKey, setSelectedDataKey] = useState<
+    "Online_Store_Session1" | "Net_Return_Values1" | "Total_Orders1"
+  >("Online_Store_Session1");
+  const [newSelectedDataKey, setNewSelectedDataKey] = useState<
+    "Online_Store_Session2" | "Net_Return_Values2" | "Total_Orders2"
+  >("Online_Store_Session2");
   const [data, setData] = useState<DataPoint[]>(generateData());
   const [hoverData, setHoverData] = useState<DataPoint | null>(
     data.find((dataPoint) => dataPoint.month === "Jan 2023") || null
@@ -198,9 +199,12 @@ export const Linechart: React.FC = () => {
     );
   };
 
-  const handleDataKeyChange = (value: keyof DataPoint, isNewLine: boolean) => {
-    setNewSelectedDataKey(value + "2");
-    setSelectedDataKey(value + "1");
+  const handleDataKeyChange = (
+    value: "Online_Store_Session" | "Net_Return_Values" | "Total_Orders",
+    isNewLine: boolean
+  ) => {
+    setNewSelectedDataKey(`${value}2` as "Online_Store_Session2" | "Net_Return_Values2" | "Total_Orders2");
+    setSelectedDataKey(`${value}1` as "Online_Store_Session1" | "Net_Return_Values1" | "Total_Orders1");
   };
 
   const handleDropdownClick = (e: { key: string }) => {
@@ -214,10 +218,8 @@ export const Linechart: React.FC = () => {
     [Dayjs | null, Dayjs | null]
   >([null, null]);
 
-  // ...
-
   const handleDateChange = (
-    dates: NoUndefinedRangeValueType<Dayjs>,
+    dates: RangePickerValue<Dayjs>,
     dateStrings: [string, string]
   ) => {
     if (selectedDataKey === "Online_Store_Session1") {
@@ -259,13 +261,13 @@ export const Linechart: React.FC = () => {
         const startDate = dates[0];
         const endDate = dates[1];
 
-        // Reset the Online_Store_Session1 array
+        // Reset the Net_Return_Values1 array
         const updatedData = data.map((dataPoint) => ({
           ...dataPoint,
           Net_Return_Values1: null,
         }));
 
-        // Update the Online_Store_Session1 array based on the selected date range
+        // Update the Net_Return_Values1 array based on the selected date range
         const updatedDataWithDateRange = updatedData.map((dataPoint) => {
           const month = dayjs(dataPoint.month, "MMM YYYY");
           if (month.isBetween(startDate, endDate, "month", "[]")) {
@@ -280,7 +282,7 @@ export const Linechart: React.FC = () => {
         setData(updatedDataWithDateRange);
         setSelectedDateRange([startDate, endDate]);
       } else {
-        // Reset Online_Store_Session1 to onlineStoreSession if no date range is selected
+        // Reset Net_Return_Values1 to netReturnValue if no date range is selected
         const resetData = data.map((dataPoint) => ({
           ...dataPoint,
           Net_Return_Values1: dataPoint.netReturnValue,
@@ -293,13 +295,13 @@ export const Linechart: React.FC = () => {
         const startDate = dates[0];
         const endDate = dates[1];
 
-        // Reset the Online_Store_Session1 array
+        // Reset the Total_Orders1 array
         const updatedData = data.map((dataPoint) => ({
           ...dataPoint,
           Total_Orders1: null,
         }));
 
-        // Update the Online_Store_Session1 array based on the selected date range
+        // Update the Total_Orders1 array based on the selected date range
         const updatedDataWithDateRange = updatedData.map((dataPoint) => {
           const month = dayjs(dataPoint.month, "MMM YYYY");
           if (month.isBetween(startDate, endDate, "month", "[]")) {
@@ -314,7 +316,7 @@ export const Linechart: React.FC = () => {
         setData(updatedDataWithDateRange);
         setSelectedDateRange([startDate, endDate]);
       } else {
-        // Reset Online_Store_Session1 to onlineStoreSession if no date range is selected
+        // Reset Total_Orders1 to totalOrders if no date range is selected
         const resetData = data.map((dataPoint) => ({
           ...dataPoint,
           Total_Orders1: dataPoint.totalOrders,
@@ -325,10 +327,8 @@ export const Linechart: React.FC = () => {
     }
   };
 
-  // ...
-
   const handleNewDateChange = (
-    dates: NoUndefinedRangeValueType<Dayjs>,
+    dates: RangePickerValue<Dayjs>,
     dateStrings: [string, string]
   ) => {
     if (newSelectedDataKey === "Online_Store_Session2") {
@@ -336,13 +336,13 @@ export const Linechart: React.FC = () => {
         const startDate = dates[0];
         const endDate = dates[1];
 
-        // Reset the Online_Store_Session1 array
+        // Reset the Online_Store_Session2 array
         const updatedData = data.map((dataPoint) => ({
           ...dataPoint,
           Online_Store_Session2: null,
         }));
 
-        // Update the Online_Store_Session1 array based on the selected date range
+        // Update the Online_Store_Session2 array based on the selected date range
         const updatedDataWithDateRange = updatedData.map((dataPoint) => {
           const month = dayjs(dataPoint.month, "MMM YYYY");
           if (month.isBetween(startDate, endDate, "month", "[]")) {
@@ -357,7 +357,7 @@ export const Linechart: React.FC = () => {
         setData(updatedDataWithDateRange);
         setNewSelectedDateRange([startDate, endDate]);
       } else {
-        // Reset Online_Store_Session1 to onlineStoreSession if no date range is selected
+        // Reset Online_Store_Session2 to newOnlineStoreSession if no date range is selected
         const resetData = data.map((dataPoint) => ({
           ...dataPoint,
           Online_Store_Session2: dataPoint.newOnlineStoreSession,
@@ -370,13 +370,13 @@ export const Linechart: React.FC = () => {
         const startDate = dates[0];
         const endDate = dates[1];
 
-        // Reset the Online_Store_Session1 array
+        // Reset the Net_Return_Values2 array
         const updatedData = data.map((dataPoint) => ({
           ...dataPoint,
           Net_Return_Values2: null,
         }));
 
-        // Update the Online_Store_Session1 array based on the selected date range
+        // Update the Net_Return_Values2 array based on the selected date range
         const updatedDataWithDateRange = updatedData.map((dataPoint) => {
           const month = dayjs(dataPoint.month, "MMM YYYY");
           if (month.isBetween(startDate, endDate, "month", "[]")) {
@@ -391,7 +391,7 @@ export const Linechart: React.FC = () => {
         setData(updatedDataWithDateRange);
         setNewSelectedDateRange([startDate, endDate]);
       } else {
-        // Reset Online_Store_Session1 to onlineStoreSession if no date range is selected
+        // Reset Net_Return_Values2 to newNetReturnValue if no date range is selected
         const resetData = data.map((dataPoint) => ({
           ...dataPoint,
           Net_Return_Values2: dataPoint.newNetReturnValue,
@@ -404,13 +404,13 @@ export const Linechart: React.FC = () => {
         const startDate = dates[0];
         const endDate = dates[1];
 
-        // Reset the Online_Store_Session1 array
+        // Reset the Total_Orders2 array
         const updatedData = data.map((dataPoint) => ({
           ...dataPoint,
           Total_Orders2: null,
         }));
 
-        // Update the Online_Store_Session1 array based on the selected date range
+        // Update the Total_Orders2 array based on the selected date range
         const updatedDataWithDateRange = updatedData.map((dataPoint) => {
           const month = dayjs(dataPoint.month, "MMM YYYY");
           if (month.isBetween(startDate, endDate, "month", "[]")) {
@@ -425,7 +425,7 @@ export const Linechart: React.FC = () => {
         setData(updatedDataWithDateRange);
         setNewSelectedDateRange([startDate, endDate]);
       } else {
-        // Reset Online_Store_Session1 to onlineStoreSession if no date range is selected
+        // Reset Total_Orders2 to newTotalOrders if no date range is selected
         const resetData = data.map((dataPoint) => ({
           ...dataPoint,
           Total_Orders2: dataPoint.newTotalOrders,
@@ -435,6 +435,7 @@ export const Linechart: React.FC = () => {
       }
     }
   };
+
   const menu = (
     <Menu
       onClick={handleDropdownClick}
@@ -515,9 +516,9 @@ export const Linechart: React.FC = () => {
   };
 
   return (
-    <div className="bg-white lg:m-5 lg:p-4 rounded-3xl">
-      <div className="flex justify-between mb-4">
-        <div className="flex flex-col lg:pl-20 lg:pr-8 min-w-[100%] md:flex-row md:gap-4">
+<div className="bg-white lg:m-5 lg:p-4 rounded-3xl">
+     <div className="flex justify-between mb-4">
+         <div className="flex flex-col lg:pl-20 lg:pr-8 min-w-[100%] md:flex-row md:gap-4">
           <div
             className="m-2 p-2 rounded-lg bg-transparent md:w-1/4"
             style={{
@@ -797,7 +798,7 @@ export const Linechart: React.FC = () => {
         >
           <XAxis dataKey="month" />
           <YAxis domain={[0, 40000]} ticks={[0, 20000, 40000]} />
-          {/* <CartesianGrid horizontal={true} stroke="#ccc" /> */}
+          <CartesianGrid horizontal={true} stroke="#ccc" />
           <Tooltip />
           <Legend />
           <Line
@@ -807,7 +808,7 @@ export const Linechart: React.FC = () => {
             strokeWidth={4}
           />
           <Line
-            strokeDasharray="3 4 5 2" // Set the line type to dotted
+            // type="dotted" // Set the line type to dotted
             dataKey={newSelectedDataKey} // Use the new data set as the key
             stroke="rgba(103,186,237 , 0.3)" // Set a different color for the new line
             strokeWidth={4}
